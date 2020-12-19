@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-greeter
+  labels:
+    app: ms-greeter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-greeter
+  template:
+    metadata:
+      name: ms-greeter
+      labels:
+        app: ms-greeter
+    spec:
+      containers:
+        - name: ms-greeter
+          image: ewintory/ms-greeter:0.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-greeter
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    app: ms-greeter
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ms-greeter-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+    - host: eyahyayev.com
+      http:
+        paths:
+          - backend:
+              serviceName: ms-greeter
+              servicePort: 80
